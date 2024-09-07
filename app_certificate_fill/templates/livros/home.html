@@ -1,0 +1,13 @@
+{% extends 'livros/base.html' %}
+{% block conteudo %}
+<form action="{% url 'listagem_livros' %}" method="post">
+    {% csrf_token %}
+      <div style="text-align: center;"class="container">
+          <h1>Registre seus livros</h1>
+          Autor <input name="autor" class="form-control-sm" type="text">
+          Título <input name="titulo" class="form-control-sm" type="text">
+          Ano <input name="ano" class="form-control-sm" type="text">
+          <button class="form-control-sm">Registrar</button>
+      </div>   
+  </form>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'livros/base.html' %}
+{% block conteudo %}
+<div class="container">
+    <h1>Listagem de Livros cadastrados:</h1>
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>id</th>
+            <th>autor</th>
+            <th>titulo</th>
+            <th>ano</th>
+        </tr>
+        {% for livro in livros %}
+        <tr>
+            <td>{{livro.id_livro}}</td>
+            <td>{{livro.autor}}</td>
+            <td>{{livro.titulo}}</td>
+            <td>{{livro.ano}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
