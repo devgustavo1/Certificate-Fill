@@ -10,8 +10,8 @@ import requests
 driver = webdriver.Chrome()
 
 def rpa_visual(livros_raspados):
-    numero_livros = 1
-    for livro in livros_raspados[:numero_livros]:
+    print("Começando automação visual.")
+    for livro in livros_raspados:
         driver.get('http://127.0.0.1:8000/')
         time.sleep(2)
         add_autor = livro[1]
@@ -32,15 +32,19 @@ def rpa_visual(livros_raspados):
         time.sleep(1)
         pyautogui.click(x=1285,y=288,button='left')
 
-    print(f"Um total de {numero_livros} foram adicionados via RPA.")
+    print(f"Encerrando automação via RPA (visual).")
+    driver.quit()
 
 def rpa_headless(livros_raspados):
     options = Options()
-    options.headless = True  # Ativar modo headless
-    driver = webdriver.Chrome(options=options)
+    options.add_argument('--headless')  # Ativa o modo headless
+    options.add_argument('--disable-gpu')  # Desativa a GPU (recomendado para headless)
+    options.add_argument('--no-sandbox')  # Desativa o sandbox (necessário em alguns ambientes)
 
+    driver = webdriver.Chrome(options=options)
+    print("Começando automação headless.")
     try:
-        for livro in livros_raspados[5:10]:  # Começando do 6º livro em diante
+        for livro in livros_raspados[5:]:  # Começando do 6º livro em diante
             # Acessar a página de formulário
             driver.get('http://127.0.0.1:8000/')
             
@@ -70,11 +74,11 @@ def rpa_headless(livros_raspados):
                 EC.element_to_be_clickable((By.XPATH, '/html/body/form/div/button'))
             )
             submit_button.click()
-
+            print(f"Livro {livro[0]} adicionado no modo HEADLESS.")
             # Aguardar um pouco para garantir que a ação foi concluída
             time.sleep(2)
 
-        print("Automação backend concluída.")
+        print("Automação headless concluída.")
     except Exception as e:
         print(f"Problema para acessar URL local: {e}")
     finally:
@@ -98,18 +102,21 @@ for row in rows:
         titulo = cells[0].text 
         autor = cells[1].text
         ano = cells[3].text
-        print(f"Esse é o livro: {titulo} - {autor} - {ano}")
+        print(f"Obtido: {titulo} - {autor} - {ano}")
         livros_raspados.append((titulo, autor, ano))
     else:
         print("Linha com número inesperado de células:", row.text)
 print("Raspagem concluída.")
-driver.quit()
 print()
 time.sleep(1)
+
 try:
-    rpa_headless(livros_raspados)
+    rpa_visual(livros_raspados[:5])
+    time.sleep(1)
 except Exception as e:
-    print("Problema para acessar URL local:", e)
+    print("Problema para capturar no modo visual:", e)
 
-
-driver.quit()
+try:
+    rpa_headless(livros_raspados[5:25])
+except Exception as e:
+    print("Problema para capturar no modo headless:", e)
