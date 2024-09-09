@@ -1,10 +1,87 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
+import pyautogui
+import requests
 
 driver = webdriver.Chrome()
 
+def rpa_visual(livros_raspados):
+    numero_livros = 1
+    for livro in livros_raspados[:numero_livros]:
+        driver.get('http://127.0.0.1:8000/')
+        time.sleep(2)
+        add_autor = livro[1]
+        add_titulo = livro[0]
+        add_ano = livro[2]
+        time.sleep(1)
+        pyautogui.click(x=646,y=292)
+        pyautogui.write(add_autor)
+
+        time.sleep(0.5)
+        pyautogui.click(x=869,y=290)
+        pyautogui.write(add_titulo)
+
+        time.sleep(0.5)
+        pyautogui.click(x=1082,y=291)
+        pyautogui.write(add_ano)
+
+        time.sleep(1)
+        pyautogui.click(x=1285,y=288,button='left')
+
+    print(f"Um total de {numero_livros} foram adicionados via RPA.")
+
+def rpa_headless(livros_raspados):
+    options = Options()
+    options.headless = True  # Ativar modo headless
+    driver = webdriver.Chrome(options=options)
+
+    try:
+        for livro in livros_raspados[5:10]:  # Começando do 6º livro em diante
+            # Acessar a página de formulário
+            driver.get('http://127.0.0.1:8000/')
+            
+            # Aguardar que os campos do formulário estejam visíveis
+            input_titulo = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/input[1]'))
+            )
+            input_autor = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/input[2]'))
+            )
+            input_ano = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/input[3]'))
+            )
+            
+            # Preencher os campos com os dados raspados
+            input_titulo.clear()
+            input_titulo.send_keys(livro[0])
+
+            input_autor.clear()
+            input_autor.send_keys(livro[1])
+
+            input_ano.clear()
+            input_ano.send_keys(livro[2])
+
+            # Encontrar e clicar no botão de submissão
+            submit_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, '/html/body/form/div/button'))
+            )
+            submit_button.click()
+
+            # Aguardar um pouco para garantir que a ação foi concluída
+            time.sleep(2)
+
+        print("Automação backend concluída.")
+    except Exception as e:
+        print(f"Problema para acessar URL local: {e}")
+    finally:
+        driver.quit()
+
 driver.get('https://en.wikipedia.org/wiki/List_of_best-selling_books')
+driver.maximize_window()
 time.sleep(3)
 
 # Encontrar elementos na página
@@ -25,10 +102,12 @@ for row in rows:
         livros_raspados.append((titulo, autor, ano))
     else:
         print("Linha com número inesperado de células:", row.text)
-
-time.sleep(3)
+print("Raspagem concluída.")
+driver.quit()
+print()
+time.sleep(1)
 try:
-    driver.get('http://127.0.0.1:8000/')
+    rpa_headless(livros_raspados)
 except Exception as e:
     print("Problema para acessar URL local:", e)
 
