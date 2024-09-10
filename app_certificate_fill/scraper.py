@@ -5,7 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import pyautogui
-import requests
+import subprocess
+import os
 
 driver = webdriver.Chrome()
 
@@ -117,6 +118,10 @@ except Exception as e:
     print("Problema para capturar no modo visual:", e)
 
 try:
-    rpa_headless(livros_raspados[5:25])
+    rpa_headless(livros_raspados[5:])
 except Exception as e:
     print("Problema para capturar no modo headless:", e)
+
+print("Iniciando a geração de certificados.")
+subprocess.run(["python", "generate_certificates.py"], check=True) #lembrar de installar a lib Pillow no sistema.
+print("Certificados gerados com sucesso.")

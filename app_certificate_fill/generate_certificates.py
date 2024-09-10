@@ -1,5 +1,4 @@
 import requests
-import os
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
